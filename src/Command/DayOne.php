@@ -40,7 +40,10 @@ class DayOne extends Command
         );
 
         dump(array_sum(
-            array_map('array_sum', $coords)
+            array_map(
+            static fn(array $coord) => (int) ($coord[0] . $coord[1]),
+                $coords
+            )
         ));
 
         return self::SUCCESS;
