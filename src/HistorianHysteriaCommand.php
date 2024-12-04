@@ -62,18 +62,15 @@ class HistorianHysteriaCommand extends Command
 
     private function solveSecondHalf(array $leftList, array $rightList): int
     {
-        $sum = 0;
-        foreach($leftList as $leftItem) {
-            $count = count(
-                array_filter(
-                    $rightList,
-                    fn(int $rightValue) => $leftItem === $rightValue
-                )
-            );
-            $sum += $count * $leftItem;
-        }
-
-        return $sum;
+        return array_sum(array_map(
+            fn(int $leftItem) => $leftItem * count(
+                    array_filter(
+                        $rightList,
+                        fn(int $rightValue) => $leftItem === $rightValue
+                    )
+                ),
+            $leftList
+        ));
     }
 
     private function parseInput(AbstractString $input): array
@@ -83,10 +80,10 @@ class HistorianHysteriaCommand extends Command
 
         $lines = $input->split(PHP_EOL);
 
-        foreach($lines as $line) {
+        foreach ($lines as $line) {
             $inputs = $line->split('   ');
-            $leftList[] = (int) $inputs[0]->toString();
-            $rightList[] = (int) $inputs[1]->toString();
+            $leftList[] = (int)$inputs[0]->toString();
+            $rightList[] = (int)$inputs[1]->toString();
         }
 
         return [$leftList, $rightList];
