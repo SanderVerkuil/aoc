@@ -1,6 +1,6 @@
 <?php
 
-namespace Sander\AdventOfCode;
+namespace Sander\AdventOfCode\HistorianHysteria;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;

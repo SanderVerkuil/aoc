@@ -2,7 +2,9 @@
     "name": "sander/advent-of-code",
     "type": "project",
     "require": {
-        "symfony/console": "^7.2"
+        "php": "^8.4",
+        "symfony/console": "^7.2",
+        "psr/log": "^3.0"
     },
     "autoload": {
         "psr-4": {
