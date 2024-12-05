@@ -32,8 +32,6 @@ class MullItOverCommand extends Command
 
         $commands = $this->parseInput(new UnicodeString($fileContents));
 
-        dump(['Found commands' => $commands]);
-
         $style->success(
             'Got the result: ' . array_sum(array_map(fn(Mul $command) => $command->value(), $commands))
         );

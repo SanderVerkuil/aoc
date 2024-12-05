@@ -1,23 +1,29 @@
 {
-    "name": "sander/advent-of-code",
-    "type": "project",
-    "require": {
-        "php": "^8.4",
-        "symfony/console": "^7.2",
-        "psr/log": "^3.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "Sander\\AdventOfCode\\": "src/"
-        }
-    },
-    "authors": [
-        {
-            "name": "Sander Verkuil",
-            "email": "s.verkuil@pm.me"
-        }
-    ],
-    "require-dev": {
-        "symfony/var-dumper": "^7.2"
+  "name": "sander/advent-of-code",
+  "type": "project",
+  "require": {
+    "php": "^8.4",
+    "symfony/console": "^7.2",
+    "psr/log": "^3.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Sander\\AdventOfCode\\": "src/"
     }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Sander\\AdventOfCode\\Tests\\": "tests/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Sander Verkuil",
+      "email": "s.verkuil@pm.me"
+    }
+  ],
+  "require-dev": {
+    "symfony/var-dumper": "^7.2",
+    "phpbench/phpbench": "^1.3"
+  }
 }
