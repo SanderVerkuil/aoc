@@ -63,8 +63,9 @@ class PrintQueueCommand extends Command
                 if($this->validateInput(
                     $numbers,
                     $rules,
-                )) {
-                    $sum += $this->middle($numbers);
+                ) !== null) {
+                    $this->logger->info('Attempting to fix the numbers');
+                    $sum += $this->fix($numbers, $rules);
                 }
             }
         }
@@ -75,26 +76,50 @@ class PrintQueueCommand extends Command
     /**
      * @param int[] $input
      * @param array<int, int[]> $rules
-     * @return bool
+     * @return null|int[]
      */
     private function validateInput(
         array $input,
         array $rules,
-    ): bool {
+    ): ?array {
         foreach($input as $index => $value) {
             foreach($rules as $before => $after) {
                 if ($before === $value) {
                     continue;
                 }
-                $this->logger->info('Checking whether {value} is before {before}, using remaining numbers {after}', ['value' => $value, 'after' => implode(', ', array_slice($input, $index + 1)), 'before' => $before]);
-                if (in_array($value, $after, true) && in_array($before, array_slice($input, $index + 1))) {
-                    $this->logger->warning('The number {value} needs to be after number  {before}', ['value' => $value, 'before' => $before]);
-                    return false;
+                $remaining = array_slice($input, $index + 1);
+                $this->logger->info('Checking whether {value} is before {before}, using remaining numbers {after}', ['value' => $value, 'after' => implode(', ', $remaining), 'before' => $before]);
+                if (in_array($value, $after, true) && in_array($before, $remaining)) {
+                    $found = $index + 1 + array_search($before, $remaining);
+                    $this->logger->warning('The number {value} needs to be after number {before} ({index}, {found})', ['value' => $value, 'before' => $before, 'index' => $index, 'found' => $found]);
+                    return [$index, $index + 1 + array_search($before, $remaining)];
                 }
             }
         }
 
-        return true;
+        return null;
+    }
+
+    /**
+     * @param int[] $input
+     * @param array<int, int[]> $rules
+     * @return int
+     */
+    private function fix(array $input, array $rules): int
+    {
+        $this->logger->error('Fixing the input according to the rules');
+        $wrongIndices  = $this->validateInput($input, $rules);
+        if ($wrongIndices === null) {
+            return $this->middle($input);
+        }
+        [$firstIndex, $secondIndex] = $wrongIndices;
+        $first = $input[$firstIndex];
+        $second = $input[$secondIndex];
+        $this->logger->info('Swapping {firstIndex} ({first}) with {secondIndex} ({second})', ['firstIndex' => $firstIndex, 'secondIndex' => $secondIndex, 'first' => $first, 'second' => $second]);
+        $input[$firstIndex] = $second;
+        $input[$secondIndex] = $first;
+
+        return $this->fix($input, $rules);
     }
 
     private function middle(array $input): int
