@@ -21,6 +21,7 @@ class RedNosedReportsCommand extends Command
         $this->addArgument('input', InputArgument::REQUIRED);
         $this->addOption('max-errors', mode: InputOption::VALUE_OPTIONAL, default: '1', suggestedValues: ['1', '2']);
     }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $logger = new ConsoleLogger($output);
