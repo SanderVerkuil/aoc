@@ -14,6 +14,9 @@ class Cell
         public ?string $frequency,
         public array $antinodes = [],
     ) {
+        if ($this->frequency !== null) {
+            $this->antinode($this->frequency);
+        }
     }
 
     public function toString(): AbstractString

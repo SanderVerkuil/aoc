@@ -102,7 +102,7 @@ class Map
             }
         }
 
-        return [];
+        return $antinodes;
     }
 
     /**
@@ -112,25 +112,29 @@ class Map
      */
     private function computeAntinodes(Cell $antenna, Cell $other): array
     {
-        $dx = $antenna->x - $other->x;
-        $dy = $antenna->y - $other->y;
+        $ddx = $dx = $antenna->x - $other->x;
+        $ddy = $dy = $antenna->y - $other->y;
 
-        $first = $this->get($antenna->x + $dx, $antenna->y + $dy);
-        $second = $this->get($other->x - $dx, $other->y - $dy);
+        $antinodes = [];
 
-        logger()->info('Difference between nodes was ({dx}, {dy}), found two positions: ({fx}, {fy}), ({sx}, {sy})', [
-            'dx' => $dx,
-            'dy' => $dy,
-            'fx' => $first?->x,
-            'fy' => $first?->y,
-            'sx' => $second?->x,
-            'sy' => $second?->y,
-        ]);
+        while (null !== ($first = $this->get($antenna->x + $dx, $antenna->y + $dy))) {
+            $first->antinode($antenna->frequency);
+            $dx += $ddx;
+            $dy += $ddy;
+            $antinodes[] = $first;
+        }
 
-        $first?->antinode($antenna->frequency);
-        $second?->antinode($antenna->frequency);
+        $dx = $ddx;
+        $dy = $ddy;
 
-        return array_filter([$first, $second]);
+        while (null !== ($second = $this->get($other->x - $dx, $other->y - $dy))) {
+            $second->antinode($antenna->frequency);
+            $dx += $ddx;
+            $dy += $ddy;
+            $antinodes[] = $second;
+        }
+
+        return $antinodes;
     }
 
     public function countAntinodes(): int {

@@ -2,13 +2,10 @@
 
 namespace Sander\AdventOfCode\ResonantCollinearity;
 
-use Sander\AdventOfCode\RedNosedReports\RedNosedReport;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\String\AbstractString;
@@ -31,9 +28,11 @@ class ResonantCollinearityCommand extends Command
 
         $map = $this->parseInput(new UnicodeString($fileContents));
 
-        $antinodes = $map->findAntinodes();
+        $map->findAntinodes();
 
         $result = $map->countAntinodes();
+
+        $output->writeln($map->toString());
 
         $style->success('Found the result: ' . $result);
 
