@@ -4,6 +4,8 @@ namespace Sander\AdventOfCode;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Symfony\Component\Console\Event\ConsoleEvent;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 
 class Logger
 {
@@ -11,8 +13,11 @@ class Logger
 
     public function __construct(
         private LoggerInterface $logger,
-    )
-    {
+    ) {
+    }
+
+    public function __invoke(ConsoleEvent $event): void {
+        static::set(new ConsoleLogger($event->getOutput()));
     }
 
     public static function get(): LoggerInterface

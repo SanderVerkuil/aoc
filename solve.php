@@ -9,23 +9,27 @@ use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Dotenv\Dotenv;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 
-if (!is_file(__DIR__.'/vendor/autoload.php')) {
+if (!is_file(__DIR__ . '/vendor/autoload.php')) {
     throw new LogicException('Composer autoload missing. Try running `composer update`.');
 }
 
-require_once __DIR__.'/vendor/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 if (!function_exists('tagged_iterator')) {
     function tagged_iterator(
-        string $tag,
+        string  $tag,
         ?string $indexAttribute = null,
         ?string $defaultIndexMethod = null,
         ?string $defaultPriorityMethod = null): TaggedIteratorArgument
@@ -45,12 +49,12 @@ $dotEnv->bootEnv(__DIR__ . '/.env');
 
 try {
     $containerCacheClassName = 'AppContainerCache';
-    $containerCacheFile = __DIR__ . '/var/cache/'.
+    $containerCacheFile = __DIR__ . '/var/cache/' .
         $_ENV['APP_ENV'] . '/' . $containerCacheClassName . '.php';
     $containerConfigCache = new ConfigCache($containerCacheFile, $_ENV['APP_DEBUG']);
-    if (!$containerConfigCache->isFresh()) {
+    if (true || !$containerConfigCache->isFresh()) {
         $containerBuilder = new ContainerBuilder();
-        $loader = new PhpFileLoader($containerBuilder, new FileLocator(__DIR__.'/config'));
+        $loader = new PhpFileLoader($containerBuilder, new FileLocator(__DIR__ . '/config'));
         try {
             $loader->load('services.php');
             $loader->load('parameters.php');
