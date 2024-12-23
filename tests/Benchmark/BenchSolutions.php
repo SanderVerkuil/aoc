@@ -34,7 +34,7 @@ class BenchSolutions
         $commandTester = new CommandTester($command);
 
         $commandTester->execute([
-            'input' => __DIR__ . '/../../days/01/input.txt'
+            'input' => __DIR__ . '/../../days/01/input_small.txt'
         ]);
     }
 
