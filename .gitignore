@@ -1,6 +1,5 @@
 /vendor/
 .idea/
 /var/cache/
-/days/**/input.txt
-/days/**/input_small.txt
+/days/**/*.txt
 
