@@ -7,28 +7,13 @@ use Symfony\Component\Console\Color;
 class Cell
 {
     public function __construct(
-        public int   $x,
-        public int   $y,
-        public int   $value,
-        public array $reachableNines = [],
-    )
-    {
+        public int  $x,
+        public int  $y,
+        public int  $value,
+        public ?int $score = null,
+    ) {
         if ($this->value === 9) {
-            $this->reachableNines = [$this];
-        }
-    }
-
-    public function addReachableNines(Cell ...$nines): void
-    {
-        foreach ($nines as $nine) {
-            $this->addReachableNine($nine);
-        }
-    }
-
-    public function addReachableNine(Cell $nine): void
-    {
-        if (!in_array($nine, $this->reachableNines)) {
-            $this->reachableNines[] = $nine;
+            $this->score = 1;
         }
     }
 
@@ -47,14 +32,9 @@ class Cell
                 8 => '#636dff',
                 9 => '#944dff',
             },
-            count($this->reachableNines) > 0 ? 'blue' : 'red'
+            $this->score !== null && $this->score > 0 ? 'blue' : 'red'
         );
 
         return $color->apply((string)$this->value);
-    }
-
-    public function reaches(array $reachableNines): bool
-    {
-        return array_any($reachableNines, fn($nine) => !in_array($nine, $this->reachableNines));
     }
 }

@@ -14,6 +14,9 @@ class Map
     /** @var array<Cell> */
     public array $ending = [];
 
+    /** @var array<Cell> */
+    public array $beginning = [];
+
     /**
      * @param array<int, array<int, Cell>> $blocks
      */
@@ -25,6 +28,9 @@ class Map
             foreach ($row as $cell) {
                 if ($cell->value === 9) {
                     $this->ending[] = $cell;
+                }
+                if ($cell->value === 0) {
+                    $this->beginning[] = $cell;
                 }
             }
         }
@@ -52,38 +58,37 @@ class Map
         return $rows;
     }
 
-    public function compute(): void
+    public function compute(): int
     {
-        /** @var \SplQueue<Cell> $queue */
-        $queue = new \SplQueue();
+        return array_sum(
+            array_map(
+                $this->getScore(...),
+                $this->beginning
+            )
+        );
+    }
 
-        foreach ($this->ending as $block) {
-            $queue->enqueue($block);
+    public function getScore(Cell $cell): int
+    {
+        logger()->info('Computing the score of cell ({x}, {y})', ['x' => $cell->x, 'y' => $cell->y]);
+        if ($cell->score !== null) {
+            return $cell->score;
         }
-
-        $queue->setIteratorMode(\SplQueue::IT_MODE_DELETE);
-
-        foreach ($queue as $cell) {
-            logger()->info('Computing cell at {x}, {y}', ['x' => $cell->x, 'y' => $cell->y]);
-
-            foreach ($this->print() as $line) {
-                logger()->debug($line);
+        $score = 0;
+        foreach(self::DIRECTIONS as [$dx, $dy]) {
+            $neighbor = $this->get($cell->x + $dx, $cell->y + $dy);
+            if ($neighbor === null) {
+                continue;
             }
 
-            foreach (self::DIRECTIONS as [$dx, $dy]) {
-                $neighbor = $this->get(
-                    $cell->x + $dx,
-                    $cell->y + $dy,
-                );
-                if ($neighbor !== null && $neighbor->value === $cell->value - 1 && $neighbor->reaches($cell->reachableNines)) {
-                    $neighbor->addReachableNines(...$cell->reachableNines);
-                    $queue[] = $neighbor;
-                }
-            }
-            if ($cell->value === 0) {
-                logger()->info('Found a trail start at ({x}, {y}), reachable nodes was: {reachable}', ['x' => $cell->x, 'y' => $cell->y, 'reachable' => count($cell->reachableNines)]);
+            if ($neighbor->value === $cell->value + 1) {
+                $neighborScore = $this->getScore($neighbor);
+                logger()->info('The score of cell ({x}, {y}) is {score}', ['x' => $cell->x, 'y' => $cell->y, 'score' => $neighborScore]);
+                $score += $neighborScore;
             }
         }
+        $cell->score = $score;
+        return $score;
     }
 
     public function score(): int
@@ -92,7 +97,7 @@ class Map
             array_map(
                 fn(array $line) => array_sum(
                     array_map(
-                        fn(Cell $cell) => $cell->value === 0 ? count($cell->reachableNines) : 0,
+                        fn(Cell $cell) => $cell->value === 0 ? ($cell->score ?? 0) : 0,
                         $line,
                     )
                 ),
